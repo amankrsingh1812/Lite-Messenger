@@ -16,9 +16,3 @@ The server program for a lightweight messenger similar to WhatsApp. It Uses Mong
 * Group Messaging
 * Media Support
 
-## To run
-
- ```
- git clone
-
-```
