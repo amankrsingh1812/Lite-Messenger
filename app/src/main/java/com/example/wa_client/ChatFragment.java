@@ -28,12 +28,14 @@ public class ChatFragment extends Fragment {
     private EditText chatbox;
     private RecyclerView recyclerView;
 
+
     // TODO: Rename and change types of parameters
     private String clientId;
 
     public ChatFragment() {
         // Required empty public constructor
     }
+
 
     public static ChatFragment newInstance(String clientId) {
         ChatFragment fragment = new ChatFragment();
@@ -42,6 +44,7 @@ public class ChatFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d(TAG, "onCreateView: chatFragment");
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         appBar = view.findViewById(R.id.toolbar2);
         appBar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
@@ -80,6 +84,16 @@ public class ChatFragment extends Fragment {
                 Log.d(TAG, "onClick: called");
                 ((MainActivity)getActivity()).sendMessage(clientId,chatbox.getText().toString(),recyclerView);
                 chatbox.getText().clear();
+                recyclerView.scrollToPosition(((MainActivity)getActivity()).clientIdToMessageListAdapter.get(clientId).getItemCount()-1);
+            }
+        });
+
+        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Log.d(TAG, "onLayoutChange:"+top+" "+bottom+" "+oldTop+" "+oldBottom);
+                if(oldBottom!=bottom||oldTop!=top)
+                    recyclerView.scrollToPosition(((MainActivity)getActivity()).clientIdToMessageListAdapter.get(clientId).getItemCount()-1);
             }
         });
 
