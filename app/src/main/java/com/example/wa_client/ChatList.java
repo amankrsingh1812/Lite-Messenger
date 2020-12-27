@@ -1,6 +1,9 @@
 package com.example.wa_client;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -68,10 +72,29 @@ public class ChatList extends Fragment {
         newChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)getActivity()).addNewcontact(new Contact("Test","123"));
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = requireActivity().getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dailog_newchat, null);
+                builder.setView(dialogView)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                ((MainActivity)getActivity()).addNewcontact(new Contact(((EditText)(dialogView.findViewById(R.id.clientName))).getText().toString(),((EditText)(dialogView.findViewById(R.id.clientId))).getText().toString()));
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                builder.create();
+                builder.show();
             }
         });
         Log.d(TAG, "onCreateView: chatlist");
         return view;
     }
+
+
 }

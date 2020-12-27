@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -21,18 +22,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public ArrayList<Contact> contacts;
     public HashMap<String,Integer> clientIdTocontacts;
     public HashMap<String ,ArrayList<Message>> clientIdToMessages;
+    public HashMap<String ,MessageListAdapter> clientIdToMessageListAdapter;
+    public String currentClientId;
+    public String currentClientName;
     RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        currentClientId = getIntent().getStringExtra("clientId");
+        currentClientName = getIntent().getStringExtra("clientName");
         contacts = new ArrayList<>();
         clientIdToMessages = new HashMap<>();
         clientIdTocontacts = new HashMap<>();
-        addNewcontact(new Contact("Test0","123"));
+        clientIdToMessageListAdapter = new HashMap<>();
         adapter = new ContactAdapter(contacts);
-        Toast toast = Toast.makeText(getApplicationContext(),"bye",Toast.LENGTH_SHORT);
+        addNewcontact(new Contact("Test0","123"));
+        Toast toast = Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -41,13 +48,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(adapter);
     }
 
+    public void setRecyclerViewChatFragment(RecyclerView recyclerView, String clientId){
+        recyclerView.setAdapter(clientIdToMessageListAdapter.get(clientId));
+    }
+
     public void addNewcontact(Contact newContact){
-        newContact.setClientName(newContact.getClientName()+contacts.size());
+        newContact.setClientName(newContact.getClientName());
         contacts.add(newContact);
         clientIdTocontacts.put(newContact.getClientId(),contacts.size()-1);
-        clientIdToMessages.put(newContact.getClientId(),new ArrayList<Message>());
+        ArrayList<Message> messageList = new ArrayList<Message>();
+        clientIdToMessages.put(newContact.getClientId(),messageList);
+        clientIdToMessageListAdapter.put(newContact.getClientId(),new MessageListAdapter(currentClientId,messageList));
         adapter.notifyItemInserted(contacts.size()-1);
-        recyclerView.scrollToPosition(contacts.size()-1);
+        if(recyclerView != null)
+            recyclerView.scrollToPosition(contacts.size()-1);
+    }
+
+    public void addNewChatMessage(Message message, String clientId){
+        ArrayList<Message> messageList = clientIdToMessages.get(clientId);
+        MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
+        messageList.add(message);
+        messageListAdapter.notifyItemInserted(messageList.size()-1);
+    }
+
+    public void sendMessage(String receiverId, String data, RecyclerView recyclerView){
+        Message message = new Message(data,System.currentTimeMillis(),currentClientId,currentClientName);
+        addNewChatMessage(message,receiverId);
+        //Add sending logic
+
     }
 
     @Override

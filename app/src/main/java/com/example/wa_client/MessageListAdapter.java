@@ -1,118 +1,117 @@
 package com.example.wa_client;
-public class MessageListAdapter{}
-//import android.content.Context;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.widget.ImageView;
-//import android.widget.TextView;
-//
-//import androidx.annotation.NonNull;
-//import androidx.recyclerview.widget.RecyclerView;
-//
-//import java.util.List;
-//
-//public class MessageListAdapter extends RecyclerView.Adapter {
-//    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
-//    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
-//
-//    private Context mContext;
-//    private List<Message> mMessageList;
-//
-//    public MessageListAdapter(Context context, List<Message> messageList) {
-//        this.mContext = context;
-//        this.mMessageList = messageList;
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return mMessageList.size();
-//    }
-//
-//    @Override
-//    public int getItemViewType(int position) {
-//        Message message =  mMessageList.get(position);
-//
-//        if (message.getSenderId().equals("123")) {
-//            // If the current user is the sender of the message
-//            return VIEW_TYPE_MESSAGE_SENT;
-//        } else {
-//            // If some other user sent the message
-//            return VIEW_TYPE_MESSAGE_RECEIVED;
-//        }
-//    }
-//
-//    @Override
-//    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View view;
-//
-//        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
-//            view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.item_message_sent, parent, false);
-//            return new SentMessageHolder(view);
-//        } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
-//            view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.item_message_received, parent, false);
-//            return new ReceivedMessageHolder(view);
-//        }
-//
-//        return null;
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-//        Message message =  mMessageList.get(position);
-//
-//        switch (holder.getItemViewType()) {
-//            case VIEW_TYPE_MESSAGE_SENT:
-//                ((SentMessageHolder) holder).bind(message);
-//                break;
-//            case VIEW_TYPE_MESSAGE_RECEIVED:
-//                ((ReceivedMessageHolder) holder).bind(message);
-//        }
-//    }
-//
-//    private class SentMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText;
-//
-//        SentMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
-//            timeText = (TextView) itemView.findViewById(R.id.text_message_time);
-//        }
-//
-//        void bind(Message message) {
-//            messageText.setText(message.getData());
-//
-//            // Format the stored timestamp into a readable String using method.
-//            timeText.setText(Utils.formatDateTime(message.getCreatedAt()));
-//        }
-//    }
-//
-//    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-//        TextView messageText, timeText, nameText;
-//        ImageView profileImage;
-//
-//        ReceivedMessageHolder(View itemView) {
-//            super(itemView);
-//
-//            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
-//            timeText = (TextView) itemView.findViewById(R.id.text_message_time);
-//            nameText = (TextView) itemView.findViewById(R.id.text_message_name);
-//            profileImage = (ImageView) itemView.findViewById(R.id.image_message_profile);
-//        }
-//
-//        void bind(Message message) {
-//            messageText.setText(message.getData());
-//
-//            // Format the stored timestamp into a readable String using method.
-//            timeText.setText(Utils.formatDateTime(message.getTimeStamp()));
-//
-//            nameText.setText(message.getSender().getNickname());
-//
-//            // Insert the profile image from the URL into the ImageView.
+import android.content.Context;
+import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Date;
+import java.util.List;
+
+import static android.text.format.DateUtils.formatDateTime;
+
+public class MessageListAdapter extends RecyclerView.Adapter {
+    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
+    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
+
+    private Context mContext;
+    private String currentClientId;
+    private List<Message> mMessageList;
+
+    public MessageListAdapter(String currentClientId, List<Message> messageList) {
+        this.currentClientId = currentClientId;
+        this.mMessageList = messageList;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mMessageList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Message message =  mMessageList.get(position);
+
+        if (message.getSenderId().equals(currentClientId)) {
+            return VIEW_TYPE_MESSAGE_SENT;
+        } else {
+            return VIEW_TYPE_MESSAGE_RECEIVED;
+        }
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+
+        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_message_sent, parent, false);
+            return new SentMessageHolder(view);
+        } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_message_received, parent, false);
+            return new ReceivedMessageHolder(view);
+        }
+
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        Message message =  mMessageList.get(position);
+
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_MESSAGE_SENT:
+                ((SentMessageHolder) holder).bind(message);
+                break;
+            case VIEW_TYPE_MESSAGE_RECEIVED:
+                ((ReceivedMessageHolder) holder).bind(message);
+        }
+    }
+
+    private class SentMessageHolder extends RecyclerView.ViewHolder {
+        TextView messageText, timeText;
+
+        SentMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
+            timeText = (TextView) itemView.findViewById(R.id.text_message_time);
+        }
+
+        void bind(Message message) {
+            messageText.setText(message.getData());
+
+            timeText.setText(android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss a",new Date(message.getTimeStamp())));
+        }
+    }
+
+    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
+        TextView messageText, timeText, nameText;
+        ImageView profileImage;
+
+        ReceivedMessageHolder(View itemView) {
+            super(itemView);
+
+            messageText = (TextView) itemView.findViewById(R.id.text_message_body);
+            timeText = (TextView) itemView.findViewById(R.id.text_message_time);
+            nameText = (TextView) itemView.findViewById(R.id.text_message_name);
+            profileImage = (ImageView) itemView.findViewById(R.id.image_message_profile);
+        }
+
+        void bind(Message message) {
+            messageText.setText(message.getData());
+
+            timeText.setText(android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss a",new Date(message.getTimeStamp())));
+            nameText.setText(message.getSenderName());
+
+            // Insert the profile image from the URL into the ImageView.
 //            Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);
-//        }
-//    }
-//}
+        }
+    }
+}

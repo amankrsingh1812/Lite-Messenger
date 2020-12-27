@@ -1,6 +1,7 @@
 package com.example.wa_client;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +45,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               Navigation.findNavController((MainActivity)context,R.id.navHostFragment).navigate(R.id.action_home2_to_chatFragment);
+                Bundle args = new Bundle();
+                args.putString("clientId",contact.getClientId());
+                Navigation.findNavController((MainActivity)context,R.id.navHostFragment).navigate(R.id.action_home2_to_chatFragment,args);
             }
         });
     }

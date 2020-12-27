@@ -5,4 +5,9 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/colorCaption</item>
     </style>
-</resources>
+    <style
+        name="SplashScreenTheme"
+        parent = "Theme.AppCompat.NoActionBar">
+        <item name="android:background">@drawable/splash_screen_background</item>
+    </style>
+    </resources>
