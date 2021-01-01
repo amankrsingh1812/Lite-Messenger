@@ -2,10 +2,8 @@ package com.example.wa_client;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,19 +11,19 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public ContactAdapter adapter;
-    public ArrayList<Contact> contacts;
-    public HashMap<String,Integer> clientIdTocontacts;
-    public HashMap<String ,ArrayList<Message>> clientIdToMessages;
-    public HashMap<String ,MessageListAdapter> clientIdToMessageListAdapter;
-    public String currentClientId;
-    public String currentClientName;
-    RecyclerView recyclerView;
+    public static ContactAdapter adapter;
+    public static ArrayList<Contact> contacts;
+    public static HashMap<String, Integer> clientIdToContacts;
+    public static HashMap<String, Contact> tempClientIdToContacts;
+    public static HashMap<String, ArrayList<Message>> clientIdToMessages;
+    public static HashMap<String, MessageListAdapter> clientIdToMessageListAdapter;
+    public static String currentClientId;
+    public static String currentClientName;
+    private static RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +33,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         currentClientName = getIntent().getStringExtra("clientName");
         contacts = new ArrayList<>();
         clientIdToMessages = new HashMap<>();
-        clientIdTocontacts = new HashMap<>();
+        clientIdToContacts = new HashMap<>();
         clientIdToMessageListAdapter = new HashMap<>();
         adapter = new ContactAdapter(contacts);
-        addNewcontact(new Contact("Test0","123"));
+        addNewContact(new Contact("Test0","123"));
         Toast toast = Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT);
         toast.show();
     }
@@ -52,10 +50,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(clientIdToMessageListAdapter.get(clientId));
     }
 
-    public void addNewcontact(Contact newContact){
-        newContact.setClientName(newContact.getClientName());
+    public static void addNewContact(Contact newContact){
+//        newContact.setClientName(newContact.getClientName());
         contacts.add(newContact);
-        clientIdTocontacts.put(newContact.getClientId(),contacts.size()-1);
+        clientIdToContacts.put(newContact.getClientId(),contacts.size()-1);
         ArrayList<Message> messageList = new ArrayList<Message>();
         clientIdToMessages.put(newContact.getClientId(),messageList);
         clientIdToMessageListAdapter.put(newContact.getClientId(),new MessageListAdapter(currentClientId,messageList));
@@ -64,18 +62,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             recyclerView.scrollToPosition(contacts.size()-1);
     }
 
-    public void addNewChatMessage(Message message, String clientId){
+    public static void addNewChatMessage(Message message, String clientId){
         ArrayList<Message> messageList = clientIdToMessages.get(clientId);
         MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
         messageList.add(message);
         messageListAdapter.notifyItemInserted(messageList.size()-1);
     }
 
-    public void sendMessage(String receiverId, String data, RecyclerView recyclerView){
+    public static void sendMessage(String receiverId, String data, RecyclerView recyclerView){
         Message message = new Message(data,System.currentTimeMillis(),currentClientId,currentClientName);
         addNewChatMessage(message,receiverId);
         //Add sending logic
+        GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data));
+    }
 
+    public static void addTempContact(String clientId, String clientName) {
+        tempClientIdToContacts.put(clientId, new Contact(clientName, clientId));
+    }
+
+    public static void removeTempContact(String clientId) {
+        tempClientIdToContacts.remove(clientId);
+    }
+
+    public static Contact getTempContact(String clientId) {
+        return tempClientIdToContacts.get(clientId);
     }
 
     @Override

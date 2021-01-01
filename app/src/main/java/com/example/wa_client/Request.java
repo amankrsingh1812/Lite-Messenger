@@ -11,7 +11,7 @@ public class Request {
     private long timeStamp;
 
     public static enum RequestType {
-        Auth, NewChat, Message, SignUp, Disconnect, POSITIVE, ERROR, InvalidToken, UserNotFound, MessageReceived
+        Auth, NewChat, Message, SignUp, Disconnect, POSITIVE, ERROR, InvalidToken, UserNotFound, MessageReceived, SignUpSuccessful, AuthSuccessful, NewChatPositive
     }
 
     Request(RequestType action, String senderId, String receiverId, String data, String token) {
