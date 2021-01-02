@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -15,28 +16,30 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static ContactAdapter adapter;
-    public static ArrayList<Contact> contacts;
-    public static HashMap<String, Integer> clientIdToContacts;
-    public static HashMap<String, Contact> tempClientIdToContacts;
-    public static HashMap<String, ArrayList<Message>> clientIdToMessages;
-    public static HashMap<String, MessageListAdapter> clientIdToMessageListAdapter;
-    public static String currentClientId;
-    public static String currentClientName;
-    private static RecyclerView recyclerView;
+    public ContactAdapter adapter;
+    public ArrayList<Contact> contacts;
+    public HashMap<String, Integer> clientIdToContacts;
+    public HashMap<String, Contact> tempClientIdToContacts;
+    public HashMap<String, ArrayList<Message>> clientIdToMessages;
+    public HashMap<String, MessageListAdapter> clientIdToMessageListAdapter;
+    public String currentClientId;
+    public String currentClientName;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        GlobalVariables.mainActivity = this;
         currentClientId = getIntent().getStringExtra("clientId");
         currentClientName = getIntent().getStringExtra("clientName");
         contacts = new ArrayList<>();
         clientIdToMessages = new HashMap<>();
+        tempClientIdToContacts = new HashMap<>();
         clientIdToContacts = new HashMap<>();
         clientIdToMessageListAdapter = new HashMap<>();
-        adapter = new ContactAdapter(contacts);
-        addNewContact(new Contact("Test0","123"));
+        adapter = new ContactAdapter(this,contacts);
+//        addNewContact(new Contact("Test0","123"));
         Toast toast = Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT);
         toast.show();
     }
@@ -50,41 +53,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(clientIdToMessageListAdapter.get(clientId));
     }
 
-    public static void addNewContact(Contact newContact){
+    public void addNewContact(Contact newContact){
 //        newContact.setClientName(newContact.getClientName());
-        contacts.add(newContact);
-        clientIdToContacts.put(newContact.getClientId(),contacts.size()-1);
-        ArrayList<Message> messageList = new ArrayList<Message>();
+        Log.d("waclonedebug", "addNewContact: start"+newContact.getClientName());
+//        contacts.add(newContact);
+        clientIdToContacts.put(newContact.getClientId(),contacts.size());
+        ArrayList<Message> messageList = new ArrayList<>();
         clientIdToMessages.put(newContact.getClientId(),messageList);
         clientIdToMessageListAdapter.put(newContact.getClientId(),new MessageListAdapter(currentClientId,messageList));
-        adapter.notifyItemInserted(contacts.size()-1);
-        if(recyclerView != null)
-            recyclerView.scrollToPosition(contacts.size()-1);
+        Log.d("waclonedebug", "addNewContact: mid1"+newContact.getClientName());
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.addContact(newContact);
+                if(recyclerView != null)
+                    recyclerView.scrollToPosition(contacts.size()-1);
+            }
+        });
+        Log.d("waclonedebug", "addNewContact: end"+newContact.getClientName());
     }
 
-    public static void addNewChatMessage(Message message, String clientId){
+    public void addNewChatMessage(Message message, String clientId){
+        Log.d("waclonedebug", "addNewChatMessage: start");
         ArrayList<Message> messageList = clientIdToMessages.get(clientId);
         MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
         messageList.add(message);
-        messageListAdapter.notifyItemInserted(messageList.size()-1);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messageListAdapter.notifyItemInserted(messageList.size()-1);
+                messageListAdapter.scrollRecyclerView();
+            }
+        });
+
+        Log.d("waclonedebug", "addNewChatMessage: end");
     }
 
-    public static void sendMessage(String receiverId, String data, RecyclerView recyclerView){
+    public void sendMessage(String receiverId, String data, RecyclerView recyclerView){
+        Log.d("waclonedebug", "sendMessage: "+receiverId);
         Message message = new Message(data,System.currentTimeMillis(),currentClientId,currentClientName);
         addNewChatMessage(message,receiverId);
         //Add sending logic
         GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data));
     }
 
-    public static void addTempContact(String clientId, String clientName) {
+    public void addTempContact(String clientId, String clientName) {
         tempClientIdToContacts.put(clientId, new Contact(clientName, clientId));
     }
 
-    public static void removeTempContact(String clientId) {
+    public void removeTempContact(String clientId) {
         tempClientIdToContacts.remove(clientId);
     }
 
-    public static Contact getTempContact(String clientId) {
+    public Contact getTempContact(String clientId) {
         return tempClientIdToContacts.get(clientId);
     }
 

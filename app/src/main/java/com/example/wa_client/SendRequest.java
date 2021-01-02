@@ -1,5 +1,7 @@
 package com.example.wa_client;
 
+import android.util.Log;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -23,6 +25,7 @@ public class SendRequest {
             outputStream = new DataOutputStream(socket.getOutputStream());
         }
         catch(IOException e) {
+            Log.d("waclonedebug", "socket Error");
             e.printStackTrace();
             return;
         }
@@ -71,7 +74,6 @@ public class SendRequest {
         }
         catch(IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 

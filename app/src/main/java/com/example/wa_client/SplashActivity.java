@@ -14,13 +14,15 @@ import java.util.concurrent.Executors;
 
 public class SplashActivity extends AppCompatActivity {
 
+    GlobalVariables globalVariables;
+    SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_splash);
-        SharedPreferences sharedPref = getSharedPreferences("apps", Context.MODE_PRIVATE);
 
-//        SharedPreferences sharedPref = getPreferences(,Context.MODE_PRIVATE);
+         globalVariables = (GlobalVariables)this.getApplication();
+//        setContentView(R.layout.activity_splash);
+         sharedPref = getSharedPreferences("apps", Context.MODE_PRIVATE);
         String clientId = sharedPref.getString("clientId","");
         String clientName = sharedPref.getString("clientName","");
         String token = sharedPref.getString("token", "NULL");
@@ -29,12 +31,21 @@ public class SplashActivity extends AppCompatActivity {
         // This is the first Activity, so initializations will happen here
         initializations();
 
+        while(!SendRequestTask.isReady()){
+            Log.d("waclonedebug", "Creating Socket...");
+        }
         Intent intent;
         if(clientId == "") {
             Toast.makeText(getApplicationContext(),"First Time",Toast.LENGTH_SHORT).show();
             intent = new Intent(this, RegisterActivity.class);
         }
         else{
+            SendRequestTask.setToken(token);
+            globalVariables.clientId=clientId;
+
+
+            globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Auth,  globalVariables.serverId, ""));
+            Log.d("waclonedebug", "auth sent");
             intent = new Intent(this,MainActivity.class);
             intent.putExtra("clientId",clientId);
             intent.putExtra("clientName",clientName);
@@ -46,13 +57,11 @@ public class SplashActivity extends AppCompatActivity {
 
     private void initializations(){
         Log.d("waclonedebug", "In initializations");
-        GlobalVariables.sendMessageService = Executors.newSingleThreadExecutor();
-        if(GlobalVariables.sendMessageService == null) Log.d("waclonedebug", "Problem");
+        globalVariables.sendMessageService = Executors.newSingleThreadExecutor();
+        globalVariables.processResponseService = Executors.newSingleThreadExecutor();
+        globalVariables.sharedPref = sharedPref;
 
-        GlobalVariables.processResponseService = Executors.newSingleThreadExecutor();
-        SendRequest sendRequest = new SendRequest("127.0.0.1", 5000);
-        SendRequestTask.setSendRequest(sendRequest);
-        ReceivingThread receivingThread = new ReceivingThread(sendRequest.getSocket());
+        ReceivingThread receivingThread = new ReceivingThread();
         receivingThread.start();
 
 

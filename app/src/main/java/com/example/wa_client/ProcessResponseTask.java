@@ -25,9 +25,9 @@ public class ProcessResponseTask implements Runnable {
             String token = request.getToken();
 
             // Store token on disk
-//            SharedPreferences.Editor editor = GlobalVariables.sharedPref.edit();
-//            editor.putString("token",token);
-//            editor.commit();
+            SharedPreferences.Editor editor = GlobalVariables.sharedPref.edit();
+            editor.putString("token",token);
+            editor.commit();
 
             SendRequestTask.setToken(token);
 
@@ -36,26 +36,50 @@ public class ProcessResponseTask implements Runnable {
         else if(action == Request.RequestType.AuthSuccessful){
             authenticated=true;
         }
-        else if(!authenticated) {
-            Log.e("waclonedebug", "Auth not done. Can not do anything else");
-            return;
-        }
+//        else if(!authenticated) {
+//            Log.d("waclonedebug", request.toString());
+//            Log.e("waclonedebug", "Auth not done. Can not do anything else");
+//            return;
+//        }
         else if(action == Request.RequestType.NewChatPositive){
             Log.v("waclonedebug", "NewChat with " + request.getData());
             String newChatReqId = request.getData();
             String newChatId = GlobalVariables.getNewChatFromMap(newChatReqId);
-            MainActivity.addNewContact(MainActivity.getTempContact(newChatId));
+//            GlobalVariables.mainActivity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+                    GlobalVariables.mainActivity.addNewContact(GlobalVariables.mainActivity.getTempContact(newChatReqId));
+//                }
+//            });
         }
         else if(action == Request.RequestType.UserNotFound){
             String newChatReqId = request.getData();
             String newChatId = GlobalVariables.removeNewChatFromMap(newChatReqId);
-            MainActivity.removeTempContact(newChatId);
+            GlobalVariables.mainActivity.removeTempContact(newChatId);
         }
         else if(action == Request.RequestType.Message){
             String senderId = request.getSenderId();
-            Contact contact = MainActivity.contacts.get(MainActivity.clientIdToContacts.get(senderId));
+            Log.d("waclonedebug", "sid "+senderId);
+
+            Contact contact;
+            if(GlobalVariables.mainActivity.clientIdToContacts.get(senderId) == null) {
+                contact = new Contact(senderId,senderId);
+//                GlobalVariables.mainActivity.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+                        GlobalVariables.mainActivity.addNewContact(contact);
+//                    }
+//                });
+                Log.d("waclonedebug", contact.getClientName());
+            }
+            else {
+//                Log.d("waclonedebug", "existing client"+MainActivity.clientIdToContacts.get(senderId));
+                contact = GlobalVariables.mainActivity.contacts.get(GlobalVariables.mainActivity.clientIdToContacts.get(senderId));
+                Log.d("waclonedebug", "existing client found");
+            }
             Message message = new Message(request.getData(), request.getTimeStamp(), senderId, contact.getClientName());
-            MainActivity.addNewChatMessage(message, senderId);
+            Log.d("waclonedebug", message.getData());
+            GlobalVariables.mainActivity.addNewChatMessage(message, senderId);
         }
         
     }

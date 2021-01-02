@@ -22,6 +22,18 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private String currentClientId;
     private List<Message> mMessageList;
+    private RecyclerView mRecyclerView;
+
+    public void scrollRecyclerView() {
+        if(mRecyclerView!=null)
+            mRecyclerView.scrollToPosition(mMessageList.size()-1);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mRecyclerView = recyclerView;
+    }
 
     public MessageListAdapter(String currentClientId, List<Message> messageList) {
         this.currentClientId = currentClientId;

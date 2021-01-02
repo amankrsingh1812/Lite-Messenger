@@ -1,5 +1,7 @@
 package com.example.wa_client;
 
+import android.util.Log;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -12,12 +14,16 @@ public class ReceivingThread extends Thread {
 
     private Socket socket;
 
-    public ReceivingThread(Socket socket) {
-        this.socket = socket;
+    public ReceivingThread() {
+//        this.socket = socket;
     }
 
     public void run() {
+        SendRequest sendRequest = new SendRequest("192.168.0.13", 5000);
+        SendRequestTask.setSendRequest(sendRequest);
+        socket = sendRequest.getSocket();
         DataInputStream inputStream;
+        Log.d("waclonedebug", "socket created");
         try {
             String input;
             Request request;

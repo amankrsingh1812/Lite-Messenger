@@ -1,5 +1,7 @@
 package com.example.wa_client;
 
+import android.util.Log;
+
 public class SendRequestTask implements Runnable {
 
 //    private Request.RequestType requestType;
@@ -22,11 +24,18 @@ public class SendRequestTask implements Runnable {
         sendRequest = sendRequest_m;
     }
 
+    public static boolean isReady()
+    {
+        return (sendRequest!=null);
+    }
     private void storeAndCloseConnection() {
-        System.out.println("Server is Offline, save to disk");
+        Log.d("waclonedebug", "Server is Offline, save to disk");
     }
 
     public void run() {
+//        while(!SendRequestTask.isReady()){
+//            ;
+//        }
         Request.RequestType reqType = request.getAction();
         if(reqType == Request.RequestType.NewChat){
             GlobalVariables.addNewChatToMap(request.getRequestId(), request.getReceiverId());

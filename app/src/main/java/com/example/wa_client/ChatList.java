@@ -62,10 +62,7 @@ public class ChatList extends Fragment {
         }
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-//        linearLayoutManager.setStackFromEnd(true);
-//        linearLayoutManager.scroll
         recyclerView.setLayoutManager(linearLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
         ((MainActivity)getActivity()).setRecyclerviewChatList(recyclerView);
         newChat = view.findViewById(R.id.addNewChat);
         newChat.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +77,8 @@ public class ChatList extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 String newChatClientName = ((EditText)(dialogView.findViewById(R.id.clientName))).getText().toString();
                                 String newChatClientId = ((EditText)(dialogView.findViewById(R.id.clientId))).getText().toString();
-                                MainActivity.addTempContact(newChatClientId, newChatClientName);
+                                ((MainActivity)getActivity()).addTempContact(newChatClientId, newChatClientName);
+//                              GlobalVariables.mainActivity.addNewContact(new Contact(newChatClientName,newChatClientId));
                                 GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, ""));
                                 dialog.dismiss();
                             }

@@ -83,6 +83,15 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Log.d(TAG, "onLayoutChange:"+top+" "+bottom+" "+oldTop+" "+oldBottom);
+                if(oldBottom!=bottom||oldTop!=top)
+                    recyclerView.scrollToPosition(((MainActivity)getActivity()).clientIdToMessageListAdapter.get(clientId).getItemCount()-1);
+            }
+        });
+
         return view;
     }
 
