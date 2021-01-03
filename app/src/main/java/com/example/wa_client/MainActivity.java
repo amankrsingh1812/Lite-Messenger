@@ -25,12 +25,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public String currentClientId;
     public String currentClientName;
     private RecyclerView recyclerView;
+    public GlobalVariables globalVariables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GlobalVariables.mainActivity = this;
+        globalVariables = (GlobalVariables)this.getApplication();
+        globalVariables.mainActivity = this;
         currentClientId = getIntent().getStringExtra("clientId");
         currentClientName = getIntent().getStringExtra("clientName");
         contacts = new ArrayList<>();
@@ -94,13 +96,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Message message = new Message(data,System.currentTimeMillis(),currentClientId,currentClientName);
         addNewChatMessage(message,receiverId);
         //Add sending logic
-        GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data));
+        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data, globalVariables));
     }
 
     public void addTempContact(String clientId, String clientName) {
         tempClientIdToContacts.put(clientId, new Contact(clientName, clientId));
     }
 
+    public void sendNewChatMessage(String newChatClientId){
+        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "",globalVariables));
+    }
     public void removeTempContact(String clientId) {
         tempClientIdToContacts.remove(clientId);
     }

@@ -13,8 +13,10 @@ import com.google.gson.Gson;
 public class ReceivingThread extends Thread {
 
     private Socket socket;
+    private GlobalVariables globalVariables;
 
-    public ReceivingThread() {
+    public ReceivingThread(GlobalVariables globalVariables) {
+        this.globalVariables = globalVariables;
 //        this.socket = socket;
     }
 
@@ -33,8 +35,9 @@ public class ReceivingThread extends Thread {
                 try {
                     input = inputStream.readUTF();
                     request = gson.fromJson(input, Request.class);
+                    Log.d("waclonedebug", "request arrived: "+request);
 //                    System.out.println(request);
-                    GlobalVariables.processResponseService.submit(new ProcessResponseTask(request));
+                    globalVariables.processResponseService.submit(new ProcessResponseTask(request,globalVariables));
                 }
                 catch (EOFException e) {
                     System.out.println("Closing socket");

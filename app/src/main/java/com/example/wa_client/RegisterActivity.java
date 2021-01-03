@@ -48,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
                 globalVariables.clientId = clientId;
                 if(globalVariables.sendMessageService == null) Log.d("waclonedebug", "Problem");
                 if(globalVariables.processResponseService == null) Log.d("waclonedebug", "Problem pms");
-                globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.SignUp,  globalVariables.serverId, ""));
+                globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.SignUp,  globalVariables.serverId, "",globalVariables));
                 Log.d("waclonedebug", "Submitted");
                 intent.putExtra("clientId",clientId);
                 intent.putExtra("clientName",clientName);

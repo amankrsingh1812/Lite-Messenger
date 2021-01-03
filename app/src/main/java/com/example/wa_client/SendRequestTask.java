@@ -8,12 +8,14 @@ public class SendRequestTask implements Runnable {
 //    private String senderId;
 //    private String data;
 
+    private GlobalVariables globalVariables;
     private Request request;
     private static SendRequest sendRequest;
     private static String token;
 
-    public SendRequestTask(Request.RequestType requestType, String receiverId, String data) {
-        this.request = new Request(requestType, GlobalVariables.clientId, receiverId, data, token);
+    public SendRequestTask(Request.RequestType requestType, String receiverId, String data, GlobalVariables globalVariables) {
+        this.globalVariables = globalVariables;
+        this.request = new Request(requestType, globalVariables.clientId, receiverId, data, token);
     }
 
     public static void setToken(String token_m){
@@ -38,7 +40,7 @@ public class SendRequestTask implements Runnable {
 //        }
         Request.RequestType reqType = request.getAction();
         if(reqType == Request.RequestType.NewChat){
-            GlobalVariables.addNewChatToMap(request.getRequestId(), request.getReceiverId());
+            globalVariables.addNewChatToMap(request.getRequestId(), request.getReceiverId());
         }
         if(!sendRequest.sendRequestSafe(request)){
             storeAndCloseConnection();

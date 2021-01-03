@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
             globalVariables.clientId=clientId;
 
 
-            globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Auth,  globalVariables.serverId, ""));
+            globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Auth,  globalVariables.serverId, "",globalVariables));
             Log.d("waclonedebug", "auth sent");
             intent = new Intent(this,MainActivity.class);
             intent.putExtra("clientId",clientId);
@@ -61,7 +61,7 @@ public class SplashActivity extends AppCompatActivity {
         globalVariables.processResponseService = Executors.newSingleThreadExecutor();
         globalVariables.sharedPref = sharedPref;
 
-        ReceivingThread receivingThread = new ReceivingThread();
+        ReceivingThread receivingThread = new ReceivingThread(globalVariables);
         receivingThread.start();
 
 

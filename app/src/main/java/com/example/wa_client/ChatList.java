@@ -79,7 +79,8 @@ public class ChatList extends Fragment {
                                 String newChatClientId = ((EditText)(dialogView.findViewById(R.id.clientId))).getText().toString();
                                 ((MainActivity)getActivity()).addTempContact(newChatClientId, newChatClientName);
 //                              GlobalVariables.mainActivity.addNewContact(new Contact(newChatClientName,newChatClientId));
-                                GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, ""));
+                                ((MainActivity)getActivity()).sendNewChatMessage(newChatClientId);
+//                                GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, ""));
                                 dialog.dismiss();
                             }
                         })

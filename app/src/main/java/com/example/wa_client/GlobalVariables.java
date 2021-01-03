@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 
 public class GlobalVariables extends Application {
-    public static ExecutorService sendMessageService, processResponseService;
-    public static MainActivity mainActivity;
-    public final static String serverId = "SERVER";
-    public static String clientId;
-    public static SharedPreferences sharedPref;
+    public ExecutorService sendMessageService, processResponseService;
+    public MainActivity mainActivity;
+    public final String serverId = "SERVER";
+    public String clientId;
+    public SharedPreferences sharedPref;
 
     public String getTest() {
         return test;
@@ -22,15 +22,15 @@ public class GlobalVariables extends Application {
     }
 
     public String test;
-    private static HashMap<String, String> newChatReqId = new HashMap<>();
+    private HashMap<String, String> newChatReqId = new HashMap<>();
 
-    public static void addNewChatToMap(String requestId, String newUserId){
+    public void addNewChatToMap(String requestId, String newUserId){
         newChatReqId.put(requestId, newUserId);
     }
-    public static String getNewChatFromMap(String requestId){
+    public String getNewChatFromMap(String requestId){
         return newChatReqId.get(requestId);
     }
-    public static String removeNewChatFromMap(String requestId){
+    public String removeNewChatFromMap(String requestId){
         String chatId = newChatReqId.get(requestId);
         newChatReqId.remove(requestId);
         return chatId;
