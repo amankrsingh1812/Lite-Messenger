@@ -47,6 +47,7 @@ public class SplashActivity extends AppCompatActivity {
             globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Auth,  globalVariables.serverId, "",globalVariables));
             Log.d("waclonedebug", "auth sent");
             intent = new Intent(this,MainActivity.class);
+
             intent.putExtra("clientId",clientId);
             intent.putExtra("clientName",clientName);
         }
