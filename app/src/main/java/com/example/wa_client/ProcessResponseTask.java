@@ -74,14 +74,22 @@ public class ProcessResponseTask implements Runnable {
 //                });
                 Log.d("waclonedebug", contact.getClientName());
             }
+
             else {
 //                Log.d("waclonedebug", "existing client"+MainActivity.clientIdToContacts.get(senderId));
                 contact = globalVariables.mainActivity.contacts.get(globalVariables.mainActivity.clientIdToContacts.get(senderId));
                 Log.d("waclonedebug", "existing client found");
             }
             Message message = new Message(request.getData(), request.getTimeStamp(), senderId, contact.getClientName());
+
             Log.d("waclonedebug", message.getData());
             globalVariables.mainActivity.addNewChatMessage(message, senderId);
+        }
+        else if(action == Request.RequestType.MessageReceived){
+            Log.d("waclonedebug", "Message" + request.getData() + "RECEIVED by receiver");
+        }
+        else if(action == Request.RequestType.MessageRead){
+            Log.d("waclonedebug", "Message" + request.getData() + "READ by receiver");
         }
         
     }

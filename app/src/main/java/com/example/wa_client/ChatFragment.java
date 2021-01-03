@@ -27,7 +27,7 @@ public class ChatFragment extends Fragment {
     private Button sendButton;
     private EditText chatbox;
     private RecyclerView recyclerView;
-
+    private Contact contact;
 
     // TODO: Rename and change types of parameters
     private String clientId;
@@ -51,6 +51,7 @@ public class ChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             clientId = getArguments().getString(ARG_PARAM1);
+            contact = ((MainActivity)getActivity()).getContact(clientId);
         }
     }
 
@@ -83,6 +84,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: called");
                 ((MainActivity)getActivity()).sendMessage(clientId,chatbox.getText().toString(),recyclerView);
+                contact.setDisplayMessage(chatbox.getText().toString());
                 chatbox.getText().clear();
                 recyclerView.scrollToPosition(((MainActivity)getActivity()).clientIdToMessageListAdapter.get(clientId).getItemCount()-1);
             }

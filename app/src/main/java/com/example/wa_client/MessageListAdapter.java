@@ -99,7 +99,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         void bind(Message message) {
             messageText.setText(message.getData());
 
-            timeText.setText(android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss a",new Date(message.getTimeStamp())));
+            timeText.setText(android.text.format.DateFormat.format("hh:mm a",new Date(message.getTimeStamp())));
         }
     }
 
@@ -119,7 +119,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         void bind(Message message) {
             messageText.setText(message.getData());
 
-            timeText.setText(android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss a",new Date(message.getTimeStamp())));
+            timeText.setText(android.text.format.DateFormat.format("hh:mm a",new Date(message.getTimeStamp())));
             nameText.setText(message.getSenderName());
 
             // Insert the profile image from the URL into the ImageView.

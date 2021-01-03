@@ -55,6 +55,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder.clientName.setText(contact.getClientName());
         holder.displayMessage.setText(contact.getDisplayMessage());
         holder.lastSeenTime.setText(contact.getLastSeenTime());
+        holder.numberUnseenMessages.setText(String.valueOf(contact.getNumberUnseenMessages()));
     }
 
     @Override
@@ -67,6 +68,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         TextView clientName;
         TextView displayMessage;
         TextView lastSeenTime;
+        TextView numberUnseenMessages;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -74,13 +76,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 @Override
                 public void onClick(View v) {
                     Bundle args = new Bundle();
-                    args.putString("clientId", ContactList.get(getAdapterPosition()).getClientId());
+                    Contact contact = ContactList.get(getAdapterPosition());
+                    contact.setNumberUnseenMessages(0);
+                    args.putString("clientId", contact.getClientId());
+
                     Navigation.findNavController((MainActivity)context,R.id.navHostFragment).navigate(R.id.action_home2_to_chatFragment,args);
                 }
             });
             clientName = itemView.findViewById(R.id.chat_name_txt);
             displayMessage = itemView.findViewById(R.id.chat_description);
             lastSeenTime = itemView.findViewById(R.id.chat_date_txt);
+            numberUnseenMessages = itemView.findViewById(R.id.chat_notifs_txt);
         }
     }
 }

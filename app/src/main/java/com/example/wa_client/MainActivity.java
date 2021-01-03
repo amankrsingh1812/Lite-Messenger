@@ -83,10 +83,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("waclonedebug", "addNewChatMessage: start");
         ArrayList<Message> messageList = clientIdToMessages.get(clientId);
         MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
+        int pos = clientIdToContacts.get(clientId);
+        Contact contact = contacts.get(pos);
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 messageList.add(message);
+                contact.incrementUnseenMessages();
+                contact.setDisplayMessage(message.getData());
+                adapter.notifyItemChanged(pos);
                 messageListAdapter.notifyItemInserted(messageList.size()-1);
                 messageListAdapter.scrollRecyclerView();
             }
@@ -94,6 +99,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Log.d("waclonedebug", "addNewChatMessage: end");
     }
+
+//    public void receivedReceiveReceipt(String reqId, String clientId, long receiveTimeStamp){
+////        Contact contact = getContact(clientId);
+//        ArrayList<Message> messageList = clientIdToMessages.get(clientId);
+//        MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
+//        for(int i=messageList.size()-1; i>=0; i--){
+//            Message message = messageList.get(i);
+//            if(message.getMessageID() == reqId) {
+//                final int pos = i;
+//                this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        message.setReceiveTimeStamp(receiveTimeStamp);
+//                        messageListAdapter.notifyItemChanged(pos);
+//                    }
+//                });
+//                return;
+//            }
+//        }
+//
+//    }
 
     public void sendMessage(String receiverId, String data, RecyclerView recyclerView){
         Log.d("waclonedebug", "sendMessage: "+receiverId);
@@ -116,6 +142,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public Contact getTempContact(String clientId) {
         return tempClientIdToContacts.get(clientId);
+    }
+
+    public Contact getContact(String clientId) {
+        return contacts.get(clientIdToContacts.get(clientId));
     }
 
     @Override
