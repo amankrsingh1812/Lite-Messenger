@@ -9,33 +9,64 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class SplashActivity extends AppCompatActivity {
 
+    GlobalVariables globalVariables;
+    SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_splash);
-        SharedPreferences sharedPref = getSharedPreferences("apps", Context.MODE_PRIVATE);
 
-//        SharedPreferences sharedPref = getPreferences(,Context.MODE_PRIVATE);
+         globalVariables = (GlobalVariables)this.getApplication();
+//        setContentView(R.layout.activity_splash);
+         sharedPref = getSharedPreferences("apps", Context.MODE_PRIVATE);
         String clientId = sharedPref.getString("clientId","");
         String clientName = sharedPref.getString("clientName","");
-        Log.d("k", "onCreate: "+clientId);
+        String token = sharedPref.getString("token", "NULL");
+//        Log.d("k", "onCreate: "+clientId);
+
+        // This is the first Activity, so initializations will happen here
+        initializations();
+
+        while(!SendRequestTask.isReady()){
+            Log.d("waclonedebug", "Creating Socket...");
+        }
+        Intent intent;
         if(clientId == "") {
             Toast.makeText(getApplicationContext(),"First Time",Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, RegisterActivity.class);
-            startActivity(intent);
-            finish();
+            intent = new Intent(this, RegisterActivity.class);
         }
         else{
+            SendRequestTask.setToken(token);
+            globalVariables.clientId=clientId;
 
 
-            Intent intent = new Intent(this,MainActivity.class);
+            globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Auth,  globalVariables.serverId, "",globalVariables));
+            Log.d("waclonedebug", "auth sent");
+            intent = new Intent(this,MainActivity.class);
+
             intent.putExtra("clientId",clientId);
             intent.putExtra("clientName",clientName);
-            startActivity(intent);
-            finish();
         }
+        startActivity(intent);
+        finish();
 
     }
+
+    private void initializations(){
+        Log.d("waclonedebug", "In initializations");
+        globalVariables.sendMessageService = Executors.newSingleThreadExecutor();
+        globalVariables.processResponseService = Executors.newSingleThreadExecutor();
+        globalVariables.sharedPref = sharedPref;
+
+        ReceivingThread receivingThread = new ReceivingThread(globalVariables);
+        receivingThread.start();
+
+
+
+    }
+
 }

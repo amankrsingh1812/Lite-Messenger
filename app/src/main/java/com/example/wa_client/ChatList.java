@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -63,10 +62,7 @@ public class ChatList extends Fragment {
         }
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-//        linearLayoutManager.setStackFromEnd(true);
-//        linearLayoutManager.scroll
         recyclerView.setLayoutManager(linearLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
         ((MainActivity)getActivity()).setRecyclerviewChatList(recyclerView);
         newChat = view.findViewById(R.id.addNewChat);
         newChat.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +75,12 @@ public class ChatList extends Fragment {
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                ((MainActivity)getActivity()).addNewcontact(new Contact(((EditText)(dialogView.findViewById(R.id.clientName))).getText().toString(),((EditText)(dialogView.findViewById(R.id.clientId))).getText().toString()));
+                                String newChatClientName = ((EditText)(dialogView.findViewById(R.id.clientName))).getText().toString();
+                                String newChatClientId = ((EditText)(dialogView.findViewById(R.id.clientId))).getText().toString();
+                                ((MainActivity)getActivity()).addTempContact(newChatClientId, newChatClientName);
+//                              GlobalVariables.mainActivity.addNewContact(new Contact(newChatClientName,newChatClientId));
+                                ((MainActivity)getActivity()).sendNewChatMessage(newChatClientId);
+//                                GlobalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, ""));
                                 dialog.dismiss();
                             }
                         })
