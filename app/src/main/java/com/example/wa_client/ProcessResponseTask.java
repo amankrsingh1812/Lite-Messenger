@@ -69,7 +69,7 @@ public class ProcessResponseTask implements Runnable {
 //                globalVariables.mainActivity.runOnUiThread(new Runnable() {
 //                    @Override
 //                    public void run() {
-                        globalVariables.mainActivity.addNewContact(contact);
+                globalVariables.mainActivity.addNewContact(contact);
 //                    }
 //                });
                 Log.d("waclonedebug", contact.getClientName());

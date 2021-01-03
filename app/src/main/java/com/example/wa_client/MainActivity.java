@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public String currentClientName;
     private RecyclerView recyclerView;
     public GlobalVariables globalVariables;
+    public boolean isProcessing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +65,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         clientIdToMessages.put(newContact.getClientId(),messageList);
         clientIdToMessageListAdapter.put(newContact.getClientId(),new MessageListAdapter(currentClientId,messageList));
         Log.d("waclonedebug", "addNewContact: mid1"+newContact.getClientName());
+        isProcessing = true;
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 adapter.addContact(newContact);
                 if(recyclerView != null)
                     recyclerView.scrollToPosition(contacts.size()-1);
+                isProcessing = false;
             }
         });
+        while (isProcessing);
         Log.d("waclonedebug", "addNewContact: end"+newContact.getClientName());
     }
 
@@ -79,10 +83,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("waclonedebug", "addNewChatMessage: start");
         ArrayList<Message> messageList = clientIdToMessages.get(clientId);
         MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
-        messageList.add(message);
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                messageList.add(message);
                 messageListAdapter.notifyItemInserted(messageList.size()-1);
                 messageListAdapter.scrollRecyclerView();
             }
