@@ -21,7 +21,7 @@ public class ReceivingThread extends Thread {
     }
 
     public void run() {
-        SendRequest sendRequest = new SendRequest("192.168.0.13", 5000);
+        SendRequest sendRequest = new SendRequest("192.168.0.104", 5000);
         SendRequestTask.setSendRequest(sendRequest);
         socket = sendRequest.getSocket();
         DataInputStream inputStream;
