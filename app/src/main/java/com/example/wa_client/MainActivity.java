@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -32,10 +33,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public String currentClientId;
     public String currentClientName;
     private RecyclerView recyclerView;
-    public GlobalVariables globalVariables;
     public boolean isProcessing;
+    public SharedPreferences sharedPreferences;
     BackgroundService mService;
-    ServiceConnection connection;
+    ServiceConnection  connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
+            mService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+
+    };
     Intent serviceIntent;
 
 
@@ -43,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        globalVariables = (GlobalVariables)this.getApplication();
-        globalVariables.mainActivity = this;
         currentClientId = getIntent().getStringExtra("clientId");
         currentClientName = getIntent().getStringExtra("clientName");
         contacts = new ArrayList<>();
@@ -56,11 +70,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        addNewContact(new Contact("Test0","123"));
         Toast toast = Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT);
         toast.show();
+        sharedPreferences = getSharedPreferences("apps", Context.MODE_PRIVATE);
 
         serviceIntent = new Intent(this, BackgroundService.class);
-        if(!isMyServiceRunning()) {
-            startService(serviceIntent);
-        }
+
+//        while(!BackgroundService.isReady()){
+////                Log.d("waclonedebug", "Creating Socket...");
+//        }
+////        if(!isMyServiceRunning()) {
+//            startService(serviceIntent);
+//        }
 
         Log.d("waclone", "mainActivity onCreate end");
     }
@@ -68,23 +87,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        connection = new ServiceConnection() {
+        bindService(serviceIntent, connection, Context.BIND_IMPORTANT);
+        BackgroundService.mainActivity = this;
 
-            @Override
-            public void onServiceConnected(ComponentName className,
-                                           IBinder service) {
-                // We've bound to LocalService, cast the IBinder and get LocalService instance
-                BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
-                mService = binder.getService();
-            }
+        Log.d("waclonedebug", "mainActivity onResume End");
+//        while (mService==null)
+//        {
+//            ;
+//        }
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-
-        };
-        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -94,17 +105,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         unbindService(connection);
     }
 
-    private boolean isMyServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (BackgroundService.class.getName().equals(service.service.getClassName())) {
-                Log.i ("isMyServiceRunning?", true+"");
-                return true;
-            }
-        }
-        Log.i ("isMyServiceRunning?", false+"");
-        return false;
-    }
+//    private boolean isMyServiceRunning() {
+//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            if (BackgroundService.class.getName().equals(service.service.getClassName())) {
+//                Log.i ("isMyServiceRunning?", true+"");
+//                return true;
+//            }
+//        }
+//        Log.i ("isMyServiceRunning?", false+"");
+//        return false;
+//    }
 
     public void setRecyclerviewChatList(RecyclerView recyclerView){
         this.recyclerView = recyclerView;
@@ -159,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Message message = new Message(data,System.currentTimeMillis(),currentClientId,currentClientName);
         addNewChatMessage(message,receiverId);
         //Add sending logic
-        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data, globalVariables));
+        mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.Message, receiverId, data, currentClientId));
     }
 
     public void addTempContact(String clientId, String clientName) {
@@ -167,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void sendNewChatMessage(String newChatClientId){
-        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "",globalVariables));
+        mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "",currentClientId));
     }
     public void removeTempContact(String clientId) {
         tempClientIdToContacts.remove(clientId);
