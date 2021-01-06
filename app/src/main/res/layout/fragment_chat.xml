@@ -46,13 +46,13 @@
         <EditText
             android:id="@+id/edittext_chatbox"
             android:hint="Enter message"
-            android:padding="7dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:paddingVertical="7dp"
+            android:paddingHorizontal="14dp"
             android:background="@drawable/layout_bg"
             android:layout_gravity="center"
             android:layout_margin="10dp"
             android:layout_width="0dp"
+            android:inputType="textCapSentences"
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:maxLines="6"/>

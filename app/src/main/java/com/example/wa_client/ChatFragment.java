@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+
 import static android.content.ContentValues.TAG;
 
 public class ChatFragment extends Fragment {
@@ -27,7 +29,7 @@ public class ChatFragment extends Fragment {
     private Button sendButton;
     private EditText chatbox;
     private RecyclerView recyclerView;
-
+    private Contact contact;
 
     // TODO: Rename and change types of parameters
     private String clientId;
@@ -51,6 +53,7 @@ public class ChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             clientId = getArguments().getString(ARG_PARAM1);
+            contact = ((MainActivity)getActivity()).getContact(clientId);
         }
     }
 
@@ -83,6 +86,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: called");
                 ((MainActivity)getActivity()).sendMessage(clientId,chatbox.getText().toString(),recyclerView);
+                contact.setDisplayMessage(chatbox.getText().toString());
                 chatbox.getText().clear();
                 recyclerView.scrollToPosition(((MainActivity)getActivity()).clientIdToMessageListAdapter.get(clientId).getItemCount()-1);
             }
@@ -109,4 +113,22 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).currentChat = clientId;
+        if(contact.getNumberUnseenMessages() > 0){
+            ArrayList<Message> messages = ((MainActivity)getActivity()).clientIdToMessages.get(clientId);
+            long latestMessageTimestamp = messages.get(messages.size()-1).getTimeStamp();
+            // Sending read receipt
+            ((MainActivity)getActivity()).globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, contact.getClientId(), String.valueOf(latestMessageTimestamp), ((MainActivity)getActivity()).globalVariables));
+            contact.setNumberUnseenMessages(0);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity)getActivity()).currentChat = null;
+    }
 }
