@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+
 import static android.content.ContentValues.TAG;
 
 public class ChatFragment extends Fragment {
@@ -111,4 +113,22 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).currentChat = clientId;
+        if(contact.getNumberUnseenMessages() > 0){
+            ArrayList<Message> messages = ((MainActivity)getActivity()).clientIdToMessages.get(clientId);
+            long latestMessageTimestamp = messages.get(messages.size()-1).getTimeStamp();
+            // Sending read receipt
+            ((MainActivity)getActivity()).globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, contact.getClientId(), String.valueOf(latestMessageTimestamp), ((MainActivity)getActivity()).globalVariables));
+            contact.setNumberUnseenMessages(0);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity)getActivity()).currentChat = null;
+    }
 }

@@ -73,7 +73,8 @@ public class Message {
         this.senderId = senderId;
         this.senderName = senderName;
         this.messageRead = false;
-//        this.messageID = messageID;
+        this.readTimeStamp = 0;
+        this.receiveTimeStamp = 0;
     }
 
     public String getSenderName() {

@@ -87,19 +87,23 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     private class SentMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText;
+        TextView messageText, timeText, receiveText, readText;
 
         SentMessageHolder(View itemView) {
             super(itemView);
 
             messageText = (TextView) itemView.findViewById(R.id.text_message_body);
             timeText = (TextView) itemView.findViewById(R.id.text_message_time);
+            receiveText = (TextView) itemView.findViewById(R.id.text_receive_receipt_time);
+            readText = (TextView) itemView.findViewById(R.id.text_read_receipt_time);
         }
 
         void bind(Message message) {
             messageText.setText(message.getData());
-
             timeText.setText(android.text.format.DateFormat.format("hh:mm a",new Date(message.getTimeStamp())));
+            receiveText.setText((message.getReceiveTimeStamp() > 0)?android.text.format.DateFormat.format("hh:mm a",new Date(message.getReceiveTimeStamp())): "");
+            readText.setText((message.getReadTimeStamp() > 0)?android.text.format.DateFormat.format("hh:mm a",new Date(message.getReadTimeStamp())): "");
+
         }
     }
 

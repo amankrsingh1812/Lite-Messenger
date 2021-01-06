@@ -38,6 +38,7 @@ public class SendRequestTask implements Runnable {
 //        while(!SendRequestTask.isReady()){
 //            ;
 //        }
+        Log.d("waclonedebug", request.getAction().name() + " " + String.valueOf(request.getTimeStamp()));
         Request.RequestType reqType = request.getAction();
         if(reqType == Request.RequestType.NewChat){
             globalVariables.addNewChatToMap(request.getRequestId(), request.getReceiverId());

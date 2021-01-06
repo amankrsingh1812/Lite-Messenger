@@ -86,10 +86,12 @@ public class ProcessResponseTask implements Runnable {
             globalVariables.mainActivity.addNewChatMessage(message, senderId);
         }
         else if(action == Request.RequestType.MessageReceived){
-            Log.d("waclonedebug", "Message" + request.getData() + "RECEIVED by receiver");
+            Log.d("waclonedebug", "Message " + request.getData() + " RECEIVED by receiver");
+            globalVariables.mainActivity.receiveReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
         }
         else if(action == Request.RequestType.MessageRead){
-            Log.d("waclonedebug", "Message" + request.getData() + "READ by receiver");
+            Log.d("waclonedebug", "Message " + request.getData() + " READ by receiver");
+            globalVariables.mainActivity.readReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
         }
         
     }

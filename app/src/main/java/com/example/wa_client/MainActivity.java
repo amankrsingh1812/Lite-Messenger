@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView recyclerView;
     public GlobalVariables globalVariables;
     public boolean isProcessing;
+    public String currentChat;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void addNewContact(Contact newContact){
 //        newContact.setClientName(newContact.getClientName());
-        Log.d("waclonedebug", "addNewContact: start"+newContact.getClientName());
+//        Log.d("waclonedebug", "addNewContact: start"+newContact.getClientName());
 //        contacts.add(newContact);
         clientIdToContacts.put(newContact.getClientId(),contacts.size());
         ArrayList<Message> messageList = new ArrayList<>();
         clientIdToMessages.put(newContact.getClientId(),messageList);
         clientIdToMessageListAdapter.put(newContact.getClientId(),new MessageListAdapter(currentClientId,messageList));
-        Log.d("waclonedebug", "addNewContact: mid1"+newContact.getClientName());
+//        Log.d("waclonedebug", "addNewContact: mid1"+newContact.getClientName());
         isProcessing = true;
         this.runOnUiThread(new Runnable() {
             @Override
@@ -76,11 +78,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         while (isProcessing);
-        Log.d("waclonedebug", "addNewContact: end"+newContact.getClientName());
+//        Log.d("waclonedebug", "addNewContact: end"+newContact.getClientName());
     }
 
     public void addNewChatMessage(Message message, String clientId){
-        Log.d("waclonedebug", "addNewChatMessage: start");
+//        Log.d("waclonedebug", "addNewChatMessage: start");
         ArrayList<Message> messageList = clientIdToMessages.get(clientId);
         MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
         int pos = clientIdToContacts.get(clientId);
@@ -88,8 +90,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d("waclonedebug", "Current Chat: " + currentChat + " " + clientId);
+                if(message.getSenderId() == clientId){
+                    if(!clientId.equals(currentChat)){
+                        contact.incrementUnseenMessages();
+                    }
+                    else{
+                        message.setMessageRead(true);
+                        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, clientId, String.valueOf(message.getTimeStamp()), globalVariables));
+                    }
+                }
+
                 messageList.add(message);
-                contact.incrementUnseenMessages();
                 contact.setDisplayMessage(message.getData());
                 adapter.notifyItemChanged(pos);
                 messageListAdapter.notifyItemInserted(messageList.size()-1);
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        Log.d("waclonedebug", "addNewChatMessage: end");
+//        Log.d("waclonedebug", "addNewChatMessage: end");
     }
 
 //    public void receivedReceiveReceipt(String reqId, String clientId, long receiveTimeStamp){
@@ -133,9 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tempClientIdToContacts.put(clientId, new Contact(clientName, clientId));
     }
 
-    public void sendNewChatMessage(String newChatClientId){
+    public void sendNewChatRequest(String newChatClientId){
         globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "",globalVariables));
     }
+
     public void removeTempContact(String clientId) {
         tempClientIdToContacts.remove(clientId);
     }
@@ -146,6 +159,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public Contact getContact(String clientId) {
         return contacts.get(clientIdToContacts.get(clientId));
+    }
+
+    public void readReceiptReceived(String clientId, long sendersTimestamp, long myTimestamp) {
+        ArrayList<Message> messageList = clientIdToMessages.get(clientId);
+        MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for(int i=messageList.size()-1;i>=0;i--){
+                    Message message = messageList.get(i);
+                    if(message.getReadTimeStamp() > 0) break;
+                    if(message.getSenderId().equals(currentClientId) && message.getTimeStamp() <= myTimestamp){
+                        message.setReadTimeStamp(sendersTimestamp);
+                        Log.d("waclonedebug", "Read RCPT: " + message.getData() + " " + sendersTimestamp);
+                        messageListAdapter.notifyItemChanged(i);
+                    }
+                }
+            }
+        });
+
+    }
+
+    public void receiveReceiptReceived(String clientId, long sendersTimestamp, long myTimestamp) {
+        ArrayList<Message> messageList = clientIdToMessages.get(clientId);
+        MessageListAdapter messageListAdapter = clientIdToMessageListAdapter.get(clientId);
+        Log.d("waclonedebug", "OL "+String.valueOf(sendersTimestamp) + " " + String.valueOf(myTimestamp));
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for(int i=messageList.size()-1;i>=0;i--){
+                    Message message = messageList.get(i);
+                    Log.d("waclonedebug", "IL "+String.valueOf(message.getReceiveTimeStamp()) + " " + String.valueOf(message.getTimeStamp()));
+                    if(message.getReceiveTimeStamp() > 0) break;
+                    if(message.getSenderId().equals(currentClientId) && message.getTimeStamp() <= myTimestamp){
+                        message.setReceiveTimeStamp(sendersTimestamp);
+                        Log.d("waclonedebug", "Receive RCPT: " + message.getData() + " " + sendersTimestamp);
+                        messageListAdapter.notifyItemChanged(i);
+                    }
+                }
+            }
+        });
     }
 
     @Override
