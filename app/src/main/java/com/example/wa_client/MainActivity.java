@@ -4,7 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -27,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView recyclerView;
     public GlobalVariables globalVariables;
     public boolean isProcessing;
+    BackgroundService mService;
+    ServiceConnection connection;
+    Intent serviceIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +56,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        addNewContact(new Contact("Test0","123"));
         Toast toast = Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT);
         toast.show();
+
+        serviceIntent = new Intent(this, BackgroundService.class);
+        if(!isMyServiceRunning()) {
+            startService(serviceIntent);
+        }
+
+        Log.d("waclone", "mainActivity onCreate end");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        connection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName className,
+                                           IBinder service) {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                BackgroundService.LocalBinder binder = (BackgroundService.LocalBinder) service;
+                mService = binder.getService();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+
+        };
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(connection);
+    }
+
+    private boolean isMyServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (BackgroundService.class.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
     }
 
     public void setRecyclerviewChatList(RecyclerView recyclerView){

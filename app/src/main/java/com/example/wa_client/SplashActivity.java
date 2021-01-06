@@ -31,6 +31,8 @@ public class SplashActivity extends AppCompatActivity {
         // This is the first Activity, so initializations will happen here
         initializations();
 
+//        Intent intent1 = new Intent(this, BackgroundService.class);
+//        startService(intent1);
         while(!SendRequestTask.isReady()){
             Log.d("waclonedebug", "Creating Socket...");
         }
