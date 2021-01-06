@@ -58,6 +58,7 @@ public class SendRequest {
             outputStream.writeUTF(gson.toJson(request));
             return true;
         } catch (IOException e) {
+            Log.d("waclonedebug", "sendRequest: failed");
             e.printStackTrace();
             return false;
         }

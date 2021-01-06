@@ -1,5 +1,6 @@
 package com.example.wa_client;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -13,10 +14,10 @@ import com.google.gson.Gson;
 public class ReceivingThread extends Thread {
 
     private Socket socket;
-    private GlobalVariables globalVariables;
+    private BackgroundService backgroundService;
 
-    public ReceivingThread(GlobalVariables globalVariables) {
-        this.globalVariables = globalVariables;
+    public ReceivingThread(BackgroundService backgroundService ) {
+        this.backgroundService = backgroundService;
 //        this.socket = socket;
     }
 
@@ -24,6 +25,7 @@ public class ReceivingThread extends Thread {
         SendRequest sendRequest = new SendRequest("192.168.0.104", 5000);
         SendRequestTask.setSendRequest(sendRequest);
         socket = sendRequest.getSocket();
+        backgroundService.socket = socket;
         DataInputStream inputStream;
         Log.d("waclonedebug", "socket created");
         try {
@@ -37,7 +39,7 @@ public class ReceivingThread extends Thread {
                     request = gson.fromJson(input, Request.class);
                     Log.d("waclonedebug", "request arrived: "+request);
 //                    System.out.println(request);
-                    globalVariables.processResponseService.submit(new ProcessResponseTask(request,globalVariables));
+                    backgroundService.processResponseService.submit(new ProcessResponseTask(request,backgroundService));
                 }
                 catch (EOFException e) {
                     System.out.println("Closing socket");
