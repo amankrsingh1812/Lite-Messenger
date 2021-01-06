@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else{
                         message.setMessageRead(true);
-                        globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, clientId, String.valueOf(message.getTimeStamp()), globalVariables));
+                        mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, clientId, String.valueOf(message.getTimeStamp()), currentClientId));
                     }
                 }
 
@@ -216,9 +216,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tempClientIdToContacts.put(clientId, new Contact(clientName, clientId));
     }
 
-    public void sendNewChatMessage(String newChatClientId){
-        mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "",currentClientId));
+    public void sendNewChatRequest(String newChatClientId) {
+        mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.NewChat, newChatClientId, "", currentClientId));
 
+    }
 
     public void removeTempContact(String clientId) {
         tempClientIdToContacts.remove(clientId);

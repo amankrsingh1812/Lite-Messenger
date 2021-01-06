@@ -121,7 +121,7 @@ public class ChatFragment extends Fragment {
             ArrayList<Message> messages = ((MainActivity)getActivity()).clientIdToMessages.get(clientId);
             long latestMessageTimestamp = messages.get(messages.size()-1).getTimeStamp();
             // Sending read receipt
-            ((MainActivity)getActivity()).globalVariables.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, contact.getClientId(), String.valueOf(latestMessageTimestamp), ((MainActivity)getActivity()).globalVariables));
+            ((MainActivity)getActivity()).mService.sendMessageService.submit(new SendRequestTask(Request.RequestType.MessageRead, contact.getClientId(), String.valueOf(latestMessageTimestamp), ((MainActivity)getActivity()).currentClientId));
             contact.setNumberUnseenMessages(0);
         }
     }

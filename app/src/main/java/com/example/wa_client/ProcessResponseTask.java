@@ -103,11 +103,11 @@ public class ProcessResponseTask implements Runnable {
         }
         else if(action == Request.RequestType.MessageReceived){
             Log.d("waclonedebug", "Message " + request.getData() + " RECEIVED by receiver");
-            globalVariables.mainActivity.receiveReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
+            mainActivity.receiveReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
         }
         else if(action == Request.RequestType.MessageRead){
             Log.d("waclonedebug", "Message " + request.getData() + " READ by receiver");
-            globalVariables.mainActivity.readReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
+            mainActivity.readReceiptReceived(request.getSenderId(), request.getTimeStamp(), Long.parseLong(request.getData()));
         }
         
     }
