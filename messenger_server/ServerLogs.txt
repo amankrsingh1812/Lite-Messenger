@@ -1,0 +1,21 @@
+Starting Server
+Aug 28, 2021 3:49:31 PM com.mongodb.diagnostics.logging.Loggers shouldUseSLF4J
+WARNING: SLF4J not found on the classpath.  Logging is disabled for the 'org.mongodb.driver' component
+Exception in thread "main" com.mongodb.MongoConfigurationException: Unable to look up TXT record for host waclonecluster.etq8i.mongodb.net
+	at com.mongodb.internal.dns.DefaultDnsResolver.resolveAdditionalQueryParametersFromTxtRecords(DefaultDnsResolver.java:131)
+	at com.mongodb.ConnectionString.<init>(ConnectionString.java:381)
+	at com.mongodb.client.MongoClients.create(MongoClients.java:61)
+	at server.App.main(App.java:29)
+Caused by: javax.naming.NameNotFoundException: DNS name not found [response code 3]; remaining name 'waclonecluster.etq8i.mongodb.net'
+	at jdk.naming.dns/com.sun.jndi.dns.DnsClient.checkResponseCode(DnsClient.java:664)
+	at jdk.naming.dns/com.sun.jndi.dns.DnsClient.isMatchResponse(DnsClient.java:582)
+	at jdk.naming.dns/com.sun.jndi.dns.DnsClient.doUdpQuery(DnsClient.java:430)
+	at jdk.naming.dns/com.sun.jndi.dns.DnsClient.query(DnsClient.java:214)
+	at jdk.naming.dns/com.sun.jndi.dns.Resolver.query(Resolver.java:81)
+	at jdk.naming.dns/com.sun.jndi.dns.DnsContext.c_getAttributes(DnsContext.java:434)
+	at java.naming/com.sun.jndi.toolkit.ctx.ComponentDirContext.p_getAttributes(ComponentDirContext.java:235)
+	at java.naming/com.sun.jndi.toolkit.ctx.PartialCompositeDirContext.getAttributes(PartialCompositeDirContext.java:141)
+	at java.naming/com.sun.jndi.toolkit.ctx.PartialCompositeDirContext.getAttributes(PartialCompositeDirContext.java:129)
+	at java.naming/javax.naming.directory.InitialDirContext.getAttributes(InitialDirContext.java:171)
+	at com.mongodb.internal.dns.DefaultDnsResolver.resolveAdditionalQueryParametersFromTxtRecords(DefaultDnsResolver.java:114)
+	... 3 more
