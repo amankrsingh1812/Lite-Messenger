@@ -57,7 +57,7 @@ bash start_server.sh
 
 ## Android Client Screen-shots
 
-<img src="/home/aman/Desktop/WA-clone/LiteMessenger/WA-Clone-Server/screenshots/1.jpeg" height="700"/> <img src="/home/aman/Desktop/WA-clone/LiteMessenger/WA-Clone-Server/screenshots/3.jpeg" height="700px"/>    <img src="/home/aman/Desktop/WA-clone/LiteMessenger/WA-Clone-Server/screenshots/2.jpeg" height="700px" width="400px"/>
+<img src="./screenshots/1.jpeg" height="700"/> <img src="./screenshots/3.jpeg" height="700px"/>    <img src="./screenshots/2.jpeg" height="700px" width="400px"/>
 
 
 
